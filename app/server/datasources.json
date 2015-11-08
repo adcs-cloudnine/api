@@ -1,0 +1,11 @@
+{
+  "db": {
+    "name": "db",
+    "connector": "memory"
+  },
+  "openeatsproject": {
+    "database": "openeatsproject",
+    "name": "openeatsproject",
+    "connector": "mongodb"
+  }
+}

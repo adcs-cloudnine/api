@@ -1,0 +1,14 @@
+{
+  "name": "Member",
+  "base": "Base",
+  "strict": false,
+  "http": {
+    "path": "users"
+  },
+  "idInjection": false,
+  "properties": {},
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

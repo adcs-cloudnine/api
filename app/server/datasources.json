@@ -7,5 +7,11 @@
     "database": "openeatsproject",
     "name": "openeatsproject",
     "connector": "mongodb"
+  },
+  "storage": {
+    "name": "storage",
+    "connector": "loopback-component-storage",
+    "provider": "filesystem",
+    "root": "./server/media"
   }
 }

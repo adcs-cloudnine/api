@@ -18,7 +18,7 @@ module.exports = function(Member) {
     'registerUser',
     {
       description: 'Registers a user.',
-      http: { path: '/register', verb: 'put' },
+      http: { path: '/register', verb: 'get' },
       accepts: [
         {
           arg: 'name',

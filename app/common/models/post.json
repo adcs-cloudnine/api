@@ -1,10 +1,10 @@
 {
-  "name": "Member",
+  "name": "Post",
   "base": "Base",
   "strict": false,
   "idInjection": false,
   "http": {
-    "path": "users"
+    "path": "posts"
   },
   "properties": {},
   "validations": [],

@@ -1,10 +1,10 @@
 {
-  "name": "Member",
+  "name": "Review",
   "base": "Base",
   "strict": false,
   "idInjection": false,
   "http": {
-    "path": "users"
+    "path": "reviews"
   },
   "properties": {},
   "validations": [],

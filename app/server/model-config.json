@@ -34,5 +34,13 @@
   "Member": {
     "dataSource": "openeatsproject",
     "public": true
+  },
+  "Post": {
+    "dataSource": "openeatsproject",
+    "public": true
+  },
+  "Review": {
+    "dataSource": "openeatsproject",
+    "public": true
   }
 }

@@ -1,33 +1,24 @@
 module.exports = function(Post) {
   Post.observe('before save', function updateTimestamp(context, next) {
     // Add a timestamp to each log entry.
+    var now = Date.now() / 1000 | 0;
+
     if (context.instance) {
-      context.instance.created = new Date();
-      context.instance.updated = new Date();
+      context.instance.joined_at = now;
+      context.instance.updated_at = now;
     } else {
-      context.data.created = new Date();
-      context.data.updated = new Date();
+      context.data.updated_at = now;
     }
+
     next();
   });
 
   Post.remoteMethod(
-    'createPostImage',
+    'uploadPostImage',
     {
       description: 'Saves images from the client to the cloud.',
-      http: { path: '/image/create', verb: 'post' },
-      accepts: [
-        //{
-        //  arg: 'postId',
-        //  type: 'string',
-        //  required: true
-        //},
-        {
-          arg: 'image',
-          type: 'buffer',
-          required: true
-        }
-      ],
+      http: { path: '/image/upload', verb: 'post' },
+      accepts: [],
       returns: { root: true }
     }
   );

@@ -3,11 +3,14 @@ module.exports = function(Post) {
     // Add a timestamp to each log entry.
     var now = Date.now() / 1000 | 0;
 
-    if (context.instance) {
-      context.instance.joined_at = now;
+    if (context.instance.id == null) {
+      context.instance.created_at = now;
       context.instance.updated_at = now;
+      context.instance.review_healthy_count = 0;
+      context.instance.review_unhealthy_count = 0;
     } else {
-      context.data.updated_at = now;
+      console.log(context.instance);
+      context.instance.updated_at = now;
     }
 
     next();
@@ -35,6 +38,30 @@ module.exports = function(Post) {
       image: image
     }, function(err, result) {
       callback(err, { success: true });
+    });
+  };
+
+  /**
+   * Updates the rating count in the post.
+   *
+   * @param postId
+   * @param rating
+   * @param callback
+   */
+  Post.updateReviewCount = function(postId, rating, callback) {
+    var query = {
+      where: {
+        id: postId
+      }
+    };
+
+    Post.findOne(query, function(err, post) {
+      if (post) {
+        post.review_healthy_count += 1;
+        post.save(function(err, results) {
+          callback(err, results);
+        });
+      }
     });
   };
 };

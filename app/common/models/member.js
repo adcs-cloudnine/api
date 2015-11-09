@@ -1,3 +1,4 @@
+var crypto = require('crypto');
 var HASH_SALT = 'SDLKjfffd0d99fw9j(@(dfjss.d.fj2*D*@)Fjkdfjf';
 
 module.exports = function(Member) {
@@ -44,6 +45,7 @@ module.exports = function(Member) {
   );
 
   /**
+   * Register a user to the system.  If email exists in the system, a 400 error is returned.
    *
    * @param userId
    * @param image
@@ -52,7 +54,6 @@ module.exports = function(Member) {
   Member.registerUser = function(name, email, password, callback) {
     Member.find({ where: { email: email } }, function(err, result) {
       if (result.length === 0) {
-        var crypto = require('crypto');
         var passwordHash = crypto.createHash('md5').update(HASH_SALT + password).digest('hex');
 
         // Register the user.
@@ -72,6 +73,54 @@ module.exports = function(Member) {
       } else {
         // Error - user already exists.
         var err = new Error('User already exists in the system');
+        err.statusCode = 400;
+
+        callback(err);
+      }
+    });
+  };
+
+  Member.remoteMethod(
+    'authenticateUser',
+    {
+      description: 'Authenticate a user.',
+      http: { path: '/authenticate', verb: 'post' },
+      accepts: [
+        {
+          arg: 'email',
+          description: 'The user email.',
+          type: 'string',
+          required: true
+        },
+        {
+          arg: 'password',
+          description: 'The user password.',
+          type: 'string',
+          required: true
+        }
+      ],
+
+      returns: { root: true }
+    }
+  );
+
+  /**
+   * Authenticate user with an email/password combination.
+   *
+   * @param email
+   * @param password
+   * @param callback
+   */
+  Member.authenticateUser = function(email, password, callback) {
+    var passwordHash = crypto.createHash('md5').update(HASH_SALT + password).digest('hex');
+
+    Member.find({ where: { email: email, password: passwordHash } }, function(err, result) {
+      if (result.length > 0) {
+        // Success.
+        callback(err, result);
+      } else {
+        // Error - invalid login.
+        var err = new Error('Invalid email/password combination');
         err.statusCode = 400;
 
         callback(err);

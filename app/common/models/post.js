@@ -1,33 +1,27 @@
 module.exports = function(Post) {
   Post.observe('before save', function updateTimestamp(context, next) {
     // Add a timestamp to each log entry.
-    if (context.instance) {
-      context.instance.created = new Date();
-      context.instance.updated = new Date();
+    var now = Date.now() / 1000 | 0;
+
+    if (context.instance.id == null) {
+      context.instance.created_at = now;
+      context.instance.updated_at = now;
+      context.instance.review_healthy_count = 0;
+      context.instance.review_unhealthy_count = 0;
     } else {
-      context.data.created = new Date();
-      context.data.updated = new Date();
+      console.log(context.instance);
+      context.instance.updated_at = now;
     }
+
     next();
   });
 
   Post.remoteMethod(
-    'createPostImage',
+    'uploadPostImage',
     {
       description: 'Saves images from the client to the cloud.',
-      http: { path: '/image/create', verb: 'post' },
-      accepts: [
-        //{
-        //  arg: 'postId',
-        //  type: 'string',
-        //  required: true
-        //},
-        {
-          arg: 'image',
-          type: 'buffer',
-          required: true
-        }
-      ],
+      http: { path: '/image/upload', verb: 'post' },
+      accepts: [],
       returns: { root: true }
     }
   );
@@ -44,6 +38,30 @@ module.exports = function(Post) {
       image: image
     }, function(err, result) {
       callback(err, { success: true });
+    });
+  };
+
+  /**
+   * Updates the rating count in the post.
+   *
+   * @param postId
+   * @param rating
+   * @param callback
+   */
+  Post.updateReviewCount = function(postId, rating, callback) {
+    var query = {
+      where: {
+        id: postId
+      }
+    };
+
+    Post.findOne(query, function(err, post) {
+      if (post) {
+        post.review_healthy_count += 1;
+        post.save(function(err, results) {
+          callback(err, results);
+        });
+      }
     });
   };
 };

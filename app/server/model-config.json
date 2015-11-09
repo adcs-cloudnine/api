@@ -42,5 +42,9 @@
   "Review": {
     "dataSource": "openeatsproject",
     "public": true
+  },
+  "container": {
+    "dataSource": "storage",
+    "public": true
   }
 }

@@ -125,12 +125,15 @@ module.exports = function(Member) {
     log.info('Member.authenticateUser() - called');
 
     var passwordHash = crypto.createHash('md5').update(HASH_SALT + password).digest('hex');
+    Member.findOne({ email: email, password: passwordHash }, function(err, result) {
+      if (result) {
+        log.info('Member.authenticateUser() - authentication success');
 
-    Member.find({ where: { email: email, password: passwordHash } }, function(err, result) {
-      if (result.length > 0) {
         // Success.
         callback(err, result);
       } else {
+        log.error('Member.authenticateUser() - authentication fail');
+
         // Error - invalid login.
         var err = new Error('Invalid email/password combination');
         err.statusCode = 400;
@@ -165,6 +168,7 @@ module.exports = function(Member) {
   );
 
   /**
+   * Adds an user as a follower.
    *
    * @param userId
    * @param followingUserId

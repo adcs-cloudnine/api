@@ -13,6 +13,11 @@ Container.saveImagePost = function(req, part) {
   var rating = req.query.rating;
   var Post = app.models.Post;
 
+  log.info('Container.saveImagePost - called');
+  log.info('Container.saveImagePost - userId:', userId);
+  log.info('Container.saveImagePost - rating:', rating);
+  log.info('Container.saveImagePost - query:', req.query);
+
   var postData = {
     user_id: userId,
     rating: rating,

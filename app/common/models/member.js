@@ -186,16 +186,16 @@ module.exports = function(Member) {
 
           user.following.push(followingUserId);
           user.save(function(err, result) {
-            log.info('Member.addFollow() - followingUserId not found.');
+            log.info('Member.addFollow() - follower added followingUserId:', followingUserId);
             callback(err, result);
           });
         } else {
-          log.info('Member.addFollow() - User found');
+          log.info('Member.addFollow() - Follower exists, not added followingUserId:', followingUserId);
+          callback(err, user);
         }
-
-        callback(err, user);
       } else {
         log.info('Member.addFollow() - User NOT found');
+        callback(err, user);
       }
     });
   };

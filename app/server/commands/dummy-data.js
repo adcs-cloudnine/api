@@ -158,7 +158,8 @@ function DummyData() {
         name: user.name,
         email: user.email,
         password: passwordHash,
-        rating: user.rating
+        rating: user.rating,
+        picture: user.picture,
       };
 
       console.log(data);

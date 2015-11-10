@@ -76,11 +76,7 @@ module.exports = function(Member) {
         Member.create(user, function(err, result) {
           log.info('Member.registerUser() - User created:', email);
 
-          var response = {
-            user: result
-          };
-
-          callback(err, response);
+          callback(err, result);
         });
       } else {
         // Error - user already exists.
@@ -183,15 +179,23 @@ module.exports = function(Member) {
 
     Member.findOne(query, function(err, user) {
       if (user) {
-        user.following.push(followingUserId);
-        user.save(function(err, result) {
-          callback(err, result);
-        });
+        log.info('Member.addFollow() - User found');
+
+        if (user.following.indexOf(followingUserId) === -1) {
+          log.info('Member.addFollow() - followingUserId not found.  Adding follow');
+
+          user.following.push(followingUserId);
+          user.save(function(err, result) {
+            log.info('Member.addFollow() - followingUserId not found.');
+            callback(err, result);
+          });
+        } else {
+          log.info('Member.addFollow() - User found');
+        }
 
         callback(err, user);
       } else {
-        log.info('Member.addFollow() - followingUserId added.');
-
+        log.info('Member.addFollow() - User NOT found');
       }
     });
   };

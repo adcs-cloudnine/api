@@ -78,7 +78,7 @@ module.exports = function(Post) {
   Post.getUserPosts = function(userId, options, callback) {
     log.info('Post.getUserPosts() - called');
 
-    Post.find({ where: { user_id: userId } }, function(err, posts) {
+    Post.find({ where: { user_id: userId }, limit: 4 }, function(err, posts) {
       log.info('Post.getUserPosts() - post count:', posts.length);
       callback(err, posts);
     });

@@ -3,20 +3,24 @@ var app = require(path.resolve(__dirname, '../../'));
 var Log = require('log');
 var log = new Log('info');
 var crypto = require('crypto');
+var async = require('async');
 var HASH_SALT = 'SDLKjfffd0d99fw9j(@(dfjss.d.fj2*D*@)Fjkdfjf';
 
 module.exports = function(Member) {
   Member.observe('before save', function updateTimestamp(context, next) {
+    var now = Date.now() / 1000 | 0;
+
     // Add a timestamp to each log entry.
     if (context.instance.id == null) {
       // Instance being created.
-      context.instance.created = new Date();
-      context.instance.updated = new Date();
+      context.instance.joined_on = now;
+      context.instance.updated_on = now;
       context.instance.following = [];
       context.instance.favorites = [];
+      context.instance.posts = [];
     } else {
       // Instance being updated.
-      context.instance.updated = new Date();
+      context.instance.updated = now;
     }
 
     next();
@@ -128,7 +132,6 @@ module.exports = function(Member) {
 
     var passwordHash = crypto.createHash('md5').update(HASH_SALT + password).digest('hex');
     Member.findOne({ where: { email: email, password: passwordHash } }, function(err, result) {
-      console.log(result);
       if (result) {
         log.info('Member.authenticateUser() - authentication success');
 
@@ -281,6 +284,12 @@ module.exports = function(Member) {
           description: 'The user ID to get.',
           type: 'string',
           required: true
+        },
+        {
+          arg: 'options',
+          description: 'Query options',
+          type: 'string',
+          required: false
         }
       ],
 
@@ -294,9 +303,11 @@ module.exports = function(Member) {
    * @param userId
    * @param callback
    */
-  Member.getUserFollowingPosts = function(userId, callback) {
+  Member.getUserFollowingPosts = function(userId, options, callback) {
     log.info('Member.getUserFollowingPosts() - called');
     var Post = app.models.Post;
+    var userList = [];
+    options = options ? options : {};
 
     Member.findOne({ where: { id: userId } }, function(err, user) {
       var query = {
@@ -306,21 +317,28 @@ module.exports = function(Member) {
       };
 
       // Build query.
-      user.following.forEach(function(follow) {
-        query.where.or.push({ id: follow });
-      });
+      if (user.following.length > 0) {
+        user.following.forEach(function(follow) {
+          query.where.or.push({ id: follow });
+        });
+      }
 
       Member.find(query, function(err, users) {
         // Load posts for each user.
-        users.forEach(function(user) {
+        async.each(users, function(user, callback) {
           user.posts = [];
 
-          Post.getUserPosts(user.id, {}, function(err, posts) {
-            user.posts = posts;
-          });
-        });
+          Post.getUserPosts(user.id, options, function(err, posts) {
+            if (posts) {
+              user.posts = posts;
+            }
+            userList.push(user);
 
-        callback(err, users);
+            callback(err);
+          });
+        }, function(err, result) {
+          callback(err, userList);
+        });
       });
     });
   };

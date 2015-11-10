@@ -388,11 +388,49 @@ module.exports = function(Member) {
 
     Member.findOne({ where: { id: userId } }, function(err, user) {
       var Post = app.models.Post;
+      var Review = app.models.Review;
+      var Member = app.models.Member;
 
-      Post.getUserPosts(user.id, { limit: limit }, function(err, posts) {
-        if (posts) {
-          user.posts = posts;
-        }
+      var getPosts = function(callback) {
+        Post.getUserPosts(user.id, { limit: limit }, function(err, posts) {
+          callback(err, posts);
+        });
+      };
+
+      var getPostCount = function(callback) {
+        Post.count({ user_id: user.id }, function(err, count) {
+          callback(err, count);
+        });
+      };
+
+      var getReviewCount = function(callback) {
+        Review.count({ user_id: user.id }, function(err, count) {
+          callback(err, count);
+        });
+      };
+
+      var getFollowingCount = function(callback) {
+        callback(null, user.following.length);
+      };
+
+      var getFollowersCount = function(callback) {
+        Member.count({ following: { in: [user.id] } }, function(err, count) {
+          callback(err, count);
+        });
+      };
+
+      async.parallel({
+        posts: async.apply(getPosts),
+        postCount: async.apply(getPostCount),
+        reviewCount: async.apply(getReviewCount),
+        followingCount: async.apply(getFollowingCount),
+        followersCount: async.apply(getFollowersCount)
+      }, function(err, results) {
+        user.posts = results.posts;
+        user.post_count = results.postCount;
+        user.review_count = results.reviewCount;
+        user.following_count = results.followingCount;
+        user.followers_count = results.followersCount;
 
         callback(err, user);
       });

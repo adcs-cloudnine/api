@@ -84,7 +84,7 @@ module.exports = function(Member) {
     'authenticateUser',
     {
       description: 'Authenticate a user.',
-      http: { path: '/authenticate', verb: 'post' },
+      http: { path: '/authenticate', verb: 'get' },
       accepts: [
         {
           arg: 'email',
@@ -124,6 +124,52 @@ module.exports = function(Member) {
         err.statusCode = 400;
 
         callback(err);
+      }
+    });
+  };
+
+  Member.remoteMethod(
+    'addFollow',
+    {
+      description: 'Follow a user.',
+      http: { path: '/users/follow/add', verb: 'get' },
+      accepts: [
+        {
+          arg: 'userId',
+          description: 'The user ID to add the follow to.',
+          type: 'string',
+          required: true
+        },
+        {
+          arg: 'followingUserId',
+          description: 'The user ID to be followed.',
+          type: 'string',
+          required: true
+        }
+      ],
+
+      returns: { root: true }
+    }
+  );
+
+  /**
+   *
+   * @param userId
+   * @param followingUserId
+   * @param callback
+   */
+  Member.addFollow = function(userId, followingUserId, callback) {
+    var query = {
+      user_id: userId
+    };
+
+    Member.findOrCreate(query, data, function(err, review, isCreate) {
+      if (isCreate == true) {
+        // Update post count.
+        var Post = app.models.Post;
+        Post.updateReviewCount(postId, rating, function(err, results) {
+          callback(err, review);
+        });
       }
     });
   };

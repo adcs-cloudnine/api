@@ -350,4 +350,52 @@ module.exports = function(Member) {
       });
     });
   };
+
+  Member.remoteMethod(
+    'getUserPosts',
+    {
+      description: 'Get follows and recent posts.',
+      http: { path: '/posts', verb: 'get' },
+      accepts: [
+        {
+          arg: 'userId',
+          description: 'The user ID to get.',
+          type: 'string',
+          required: true
+        },
+        {
+          arg: 'limit',
+          description: 'The number of posts to return',
+          type: 'string',
+          required: false
+        }
+      ],
+
+      returns: { root: true }
+    }
+  );
+
+  /**
+   * Get the posts of a user.
+   *
+   * @param userId
+   * @param limit
+   * @param callback
+   */
+  Member.getUserPosts = function(userId, limit, callback) {
+    log.info('Member.getUserPosts() - called');
+    limit = limit ? limit : 25;
+
+    Member.findOne({ where: { id: userId } }, function(err, user) {
+      var Post = app.models.Post;
+
+      Post.getUserPosts(user.id, { limit: limit }, function(err, posts) {
+        if (posts) {
+          user.posts = posts;
+        }
+
+        callback(err, user);
+      });
+    });
+  };
 };

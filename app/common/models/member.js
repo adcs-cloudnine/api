@@ -1,3 +1,5 @@
+var path = require('path');
+var app = require(path.resolve(__dirname, '../../'));
 var Log = require('log');
 var log = new Log('info');
 var crypto = require('crypto');
@@ -125,7 +127,8 @@ module.exports = function(Member) {
     log.info('Member.authenticateUser() - called');
 
     var passwordHash = crypto.createHash('md5').update(HASH_SALT + password).digest('hex');
-    Member.findOne({ email: email, password: passwordHash }, function(err, result) {
+    Member.findOne({ where: { email: email, password: passwordHash } }, function(err, result) {
+      console.log(result);
       if (result) {
         log.info('Member.authenticateUser() - authentication success');
 
@@ -178,7 +181,9 @@ module.exports = function(Member) {
     log.info('Member.addFollow() - called');
 
     var query = {
-      user_id: userId
+      where: {
+        id: userId
+      }
     };
 
     Member.findOne(query, function(err, user) {
@@ -229,7 +234,7 @@ module.exports = function(Member) {
   );
 
   /**
-   * Removes an user as a follower.
+   * Removes a user as a follower.
    *
    * @param userId
    * @param followingUserId
@@ -262,6 +267,61 @@ module.exports = function(Member) {
         log.info('Member.removeFollow() - User NOT found');
         callback(err, user);
       }
+    });
+  };
+
+  Member.remoteMethod(
+    'getUserFollowingPosts',
+    {
+      description: 'Get follows and recent posts.',
+      http: { path: '/following/posts', verb: 'get' },
+      accepts: [
+        {
+          arg: 'userId',
+          description: 'The user ID to get.',
+          type: 'string',
+          required: true
+        }
+      ],
+
+      returns: { root: true }
+    }
+  );
+
+  /**
+   * Get the posts of the users that are followed.
+   *
+   * @param userId
+   * @param callback
+   */
+  Member.getUserFollowingPosts = function(userId, callback) {
+    log.info('Member.getUserFollowingPosts() - called');
+    var Post = app.models.Post;
+
+    Member.findOne({ where: { id: userId } }, function(err, user) {
+      var query = {
+        where: {
+          or: []
+        }
+      };
+
+      // Build query.
+      user.following.forEach(function(follow) {
+        query.where.or.push({ id: follow });
+      });
+
+      Member.find(query, function(err, users) {
+        // Load posts for each user.
+        users.forEach(function(user) {
+          user.posts = [];
+
+          Post.getUserPosts(user.id, {}, function(err, posts) {
+            user.posts = posts;
+          });
+        });
+
+        callback(err, users);
+      });
     });
   };
 };

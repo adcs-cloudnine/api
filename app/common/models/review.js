@@ -1,5 +1,7 @@
 var path = require('path');
 var app = require(path.resolve(__dirname, '../../'));
+var Log = require('log');
+var log = new Log('info');
 
 var REVIEW_RATINGS = [
   'healthy',

@@ -1,3 +1,6 @@
+var Log = require('log');
+var log = new Log('info');
+
 module.exports = function(Post) {
   Post.observe('before save', function updateTimestamp(context, next) {
     // Add a timestamp to each log entry.
@@ -49,6 +52,8 @@ module.exports = function(Post) {
    * @param callback
    */
   Post.updateReviewCount = function(postId, rating, callback) {
+    log.info('Post.updateReviewCount() - called');
+
     var query = {
       where: {
         id: postId
@@ -62,6 +67,20 @@ module.exports = function(Post) {
           callback(err, results);
         });
       }
+    });
+  };
+
+  /**
+   *
+   * @param userId
+   * @param options
+   */
+  Post.getUserPosts = function(userId, options, callback) {
+    log.info('Post.getUserPosts() - called');
+
+    Post.find({ where: { user_id: userId } }, function(err, posts) {
+      log.info('Post.getUserPosts() - post count:', posts.length);
+      callback(err, posts);
     });
   };
 };

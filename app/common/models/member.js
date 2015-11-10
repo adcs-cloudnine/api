@@ -286,8 +286,14 @@ module.exports = function(Member) {
           required: true
         },
         {
-          arg: 'options',
-          description: 'Query options',
+          arg: 'userLimit',
+          description: 'The number of users to return',
+          type: 'string',
+          required: false
+        },
+        {
+          arg: 'postLimit',
+          description: 'The number of posts per user to return',
           type: 'string',
           required: false
         }
@@ -303,17 +309,19 @@ module.exports = function(Member) {
    * @param userId
    * @param callback
    */
-  Member.getUserFollowingPosts = function(userId, options, callback) {
+  Member.getUserFollowingPosts = function(userId, userLimit, postLimit, callback) {
     log.info('Member.getUserFollowingPosts() - called');
     var Post = app.models.Post;
     var userList = [];
-    options = options ? options : {};
+    postLimit = postLimit ? postLimit : 5;
+    userLimit = userLimit ? userLimit : 50;
 
     Member.findOne({ where: { id: userId } }, function(err, user) {
       var query = {
         where: {
           or: []
-        }
+        },
+        limit: userLimit
       };
 
       // Build query.
@@ -328,7 +336,7 @@ module.exports = function(Member) {
         async.each(users, function(user, callback) {
           user.posts = [];
 
-          Post.getUserPosts(user.id, options, function(err, posts) {
+          Post.getUserPosts(user.id, { limit: postLimit }, function(err, posts) {
             if (posts) {
               user.posts = posts;
             }

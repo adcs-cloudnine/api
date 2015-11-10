@@ -1,16 +1,22 @@
+var Log = require('log');
+var log = new Log('info');
 var crypto = require('crypto');
 var HASH_SALT = 'SDLKjfffd0d99fw9j(@(dfjss.d.fj2*D*@)Fjkdfjf';
 
 module.exports = function(Member) {
   Member.observe('before save', function updateTimestamp(context, next) {
     // Add a timestamp to each log entry.
-    if (context.instance) {
+    if (context.instance.id == null) {
+      // Instance being created.
       context.instance.created = new Date();
       context.instance.updated = new Date();
+      context.instance.following = [];
+      context.instance.favorites = [];
     } else {
-      context.data.created = new Date();
-      context.data.updated = new Date();
+      // Instance being updated.
+      context.instance.updated = new Date();
     }
+
     next();
   });
 
@@ -52,8 +58,12 @@ module.exports = function(Member) {
    * @param callback
    */
   Member.registerUser = function(name, email, password, callback) {
+    log.info('Member.registerUser() - called');
+
     Member.find({ where: { email: email } }, function(err, result) {
       if (result.length === 0) {
+        log.info('Member.registerUser() - User email does not exist in system.  Creating user.');
+
         var passwordHash = crypto.createHash('md5').update(HASH_SALT + password).digest('hex');
 
         // Register the user.
@@ -64,6 +74,8 @@ module.exports = function(Member) {
         };
 
         Member.create(user, function(err, result) {
+          log.info('Member.registerUser() - User created:', email);
+
           var response = {
             user: result
           };
@@ -72,6 +84,8 @@ module.exports = function(Member) {
         });
       } else {
         // Error - user already exists.
+        log.error('Member.registerUser() - user already exists:', email);
+
         var err = new Error('User already exists in the system');
         err.statusCode = 400;
 
@@ -112,6 +126,8 @@ module.exports = function(Member) {
    * @param callback
    */
   Member.authenticateUser = function(email, password, callback) {
+    log.info('Member.authenticateUser() - called');
+
     var passwordHash = crypto.createHash('md5').update(HASH_SALT + password).digest('hex');
 
     Member.find({ where: { email: email, password: passwordHash } }, function(err, result) {
@@ -159,17 +175,23 @@ module.exports = function(Member) {
    * @param callback
    */
   Member.addFollow = function(userId, followingUserId, callback) {
+    log.info('Member.addFollow() - called');
+
     var query = {
       user_id: userId
     };
 
-    Member.findOrCreate(query, data, function(err, review, isCreate) {
-      if (isCreate == true) {
-        // Update post count.
-        var Post = app.models.Post;
-        Post.updateReviewCount(postId, rating, function(err, results) {
-          callback(err, review);
+    Member.findOne(query, function(err, user) {
+      if (user) {
+        user.following.push(followingUserId);
+        user.save(function(err, result) {
+          callback(err, result);
         });
+
+        callback(err, user);
+      } else {
+        log.info('Member.addFollow() - followingUserId added.');
+
       }
     });
   };

@@ -203,4 +203,65 @@ module.exports = function(Member) {
       }
     });
   };
+
+  Member.remoteMethod(
+    'removeFollow',
+    {
+      description: 'Remove a user that is followed.',
+      http: { path: '/users/follow/remove', verb: 'get' },
+      accepts: [
+        {
+          arg: 'userId',
+          description: 'The user ID to remove the follow from.',
+          type: 'string',
+          required: true
+        },
+        {
+          arg: 'followingUserId',
+          description: 'The user ID to be removed.',
+          type: 'string',
+          required: true
+        }
+      ],
+
+      returns: { root: true }
+    }
+  );
+
+  /**
+   * Removes an user as a follower.
+   *
+   * @param userId
+   * @param followingUserId
+   * @param callback
+   */
+  Member.removeFollow = function(userId, followingUserId, callback) {
+    log.info('Member.removeFollow() - called');
+
+    var query = {
+      user_id: userId
+    };
+
+    Member.findOne(query, function(err, user) {
+      if (user) {
+        log.info('Member.removeFollow() - User found');
+
+        var following = user.following;
+        var index = following.indexOf(followingUserId);
+        if (index > -1) {
+          following.splice(index, 1);
+        }
+
+        user.following = following;
+        user.save(function(err, user) {
+          log.info('Member.removeFollow() - removed follow followingUserId:', followingUserId);
+          callback(err, user);
+        });
+
+      } else {
+        log.info('Member.removeFollow() - User NOT found');
+        callback(err, user);
+      }
+    });
+  };
 };

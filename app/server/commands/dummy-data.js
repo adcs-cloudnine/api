@@ -42,6 +42,7 @@ function DummyData() {
     user.email = 'mp';
     user.password = 'mp';
     user.rating = 'healthy';
+    user.bio = 'Author of nine books about healthy eating, food philosophy, and the evolution of the things we eat.';
     user.picture = {
       large: 'https://s3.amazonaws.com/openeatsproject/users/michael-pollan.jpg',
       medium: 'https://s3.amazonaws.com/openeatsproject/users/michael-pollan.jpg',
@@ -54,6 +55,7 @@ function DummyData() {
     user.email = 'gf';
     user.password = 'gf';
     user.rating = 'unhealthy';
+    user.bio = 'American restaurateur, author, game host, and television personality currently working for Food Network.';
     user.picture = {
       large: 'https://s3.amazonaws.com/openeatsproject/users/guy-fiery.jpg',
       medium: 'https://s3.amazonaws.com/openeatsproject/users/guy-fiery.jpg',
@@ -66,6 +68,7 @@ function DummyData() {
     user.email = 'ab';
     user.password = 'ab';
     user.rating = 'healthy';
+    user.bio = 'American chef, author, TV personality, and veteran of numerous professional kitchens';
     user.picture = {
       large: 'https://s3.amazonaws.com/openeatsproject/users/anthony-bourdain.jpg',
       medium: 'https://s3.amazonaws.com/openeatsproject/users/anthony-bourdain.jpg',
@@ -78,6 +81,7 @@ function DummyData() {
     user.email = 'jc';
     user.password = 'jc';
     user.rating = 'healthy';
+    user.bio = 'Joe Cross is an Australian entrepreneur, author, filmmaker, and wellness advocate.';
     user.picture = {
       large: 'https://s3.amazonaws.com/openeatsproject/users/joe-cross.jpg',
       medium: 'https://s3.amazonaws.com/openeatsproject/users/joe-cross.jpg',
@@ -90,6 +94,7 @@ function DummyData() {
     user.email = 'sm';
     user.password = 'sm';
     user.rating = 'healthy';
+    user.bio = 'Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.';
     user.picture = {
       large: 'https://s3.amazonaws.com/openeatsproject/users/sai-majeti.jpg',
       medium: 'https://s3.amazonaws.com/openeatsproject/users/sai-majeti.jpg',
@@ -102,6 +107,7 @@ function DummyData() {
     user.email = 'st';
     user.password = 'st';
     user.rating = 'healthy';
+    user.bio = 'Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.';
     user.picture = {
       large: 'https://s3.amazonaws.com/openeatsproject/users/sukriti-thapa.jpg',
       medium: 'https://s3.amazonaws.com/openeatsproject/users/sukriti-thapa.jpg',
@@ -114,6 +120,7 @@ function DummyData() {
     user.email = 'cw';
     user.password = 'cw';
     user.rating = 'unhealthy';
+    user.bio = 'Eat food, not too much, mostly plants.';
     user.picture = {
       large: 'https://s3.amazonaws.com/openeatsproject/users/caleb-whang.jpg',
       medium: 'https://s3.amazonaws.com/openeatsproject/users/caleb-whang.jpg',
@@ -126,6 +133,7 @@ function DummyData() {
     user.email = 'gd';
     user.password = 'gd';
     user.rating = 'healthy';
+    user.bio = 'Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.';
     user.picture = {
       large: 'https://s3.amazonaws.com/openeatsproject/users/gaurang-dave.jpg',
       medium: 'https://s3.amazonaws.com/openeatsproject/users/gaurang-dave.jpg',
@@ -138,6 +146,7 @@ function DummyData() {
     user.email = 'no';
     user.password = 'no';
     user.rating = 'healthy';
+    user.bio = '';
     user.picture = {
       large: 'https://s3.amazonaws.com/openeatsproject/users/nick-ostrowski.jpg',
       medium: 'https://s3.amazonaws.com/openeatsproject/users/nick-ostrowski.jpg',
@@ -157,9 +166,10 @@ function DummyData() {
       var data = {
         name: user.name,
         email: user.email,
+        bio: user.bio,
         password: passwordHash,
         rating: user.rating,
-        picture: user.picture,
+        picture: user.picture
       };
 
       User.create(data, function(err, user) {
@@ -265,14 +275,14 @@ function DummyData() {
       postCreate.user_id = userId;
 
       var image = images['healthy'][Math.floor(Math.random()*images['healthy'].length)];
+      var randomDate = Math.random() * (1447113600 - 1443657600) + 1443657600 | 0;
+
       postCreate.images = {
         small: image,
         medium: image,
         large: image
       };
       postCreate.rating = 'healthy';
-
-      var randomDate = Math.random() * (1447113600 - 1443657600) + 1443657600 | 0;
       postCreate.created_at = randomDate;
       postCreate.updated_at = randomDate;
       posts.push(postCreate);
@@ -284,12 +294,16 @@ function DummyData() {
       postCreate.user_id = userId;
 
       var image = images['unhealthy'][Math.floor(Math.random()*images['unhealthy'].length)];
+      var randomDate = Math.random() * (1447113600 - 1443657600) + 1443657600 | 0;
+
       postCreate.images = {
         small: image,
         medium: image,
         large: image
       };
       postCreate.rating = 'unhealthy';
+      postCreate.created_at = randomDate;
+      postCreate.updated_at = randomDate;
       posts.push(postCreate);
     }
 

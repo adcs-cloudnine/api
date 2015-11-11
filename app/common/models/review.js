@@ -14,7 +14,7 @@ module.exports = function(Review) {
     'addRating',
     {
       description: 'Add a review rating for a post.',
-      http: { path: '/add', verb: 'post' },
+      http: { path: '/add', verb: 'get' },
       accepts: [
         {
           arg: 'rating',

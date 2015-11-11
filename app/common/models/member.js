@@ -426,11 +426,11 @@ module.exports = function(Member) {
         followingCount: async.apply(getFollowingCount),
         followersCount: async.apply(getFollowersCount)
       }, function(err, results) {
-        user.posts = results.posts;
         user.post_count = results.postCount;
         user.review_count = results.reviewCount;
         user.following_count = results.followingCount;
         user.followers_count = results.followersCount;
+        user.posts = results.posts;
 
         callback(err, user);
       });

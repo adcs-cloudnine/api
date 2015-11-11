@@ -1,5 +1,8 @@
+var path = require('path');
+var app = require(path.resolve(__dirname, '../../'));
 var Log = require('log');
 var log = new Log('info');
+var async = require('async');
 
 module.exports = function(Post) {
   Post.observe('before save', function updateTimestamp(context, next) {
@@ -80,6 +83,67 @@ module.exports = function(Post) {
 
     Post.find({ where: { user_id: userId }, limit: options.limit }, function(err, posts) {
       log.info('Post.getUserPosts() - post count:', posts.length);
+      callback(err, posts);
+    });
+  };
+
+  Post.remoteMethod(
+    'getPostStream',
+    {
+      description: 'Get posts that are to be reviewed by the user.',
+      http: { path: '/review-stream', verb: 'get' },
+      accepts: [
+        {
+          arg: 'userId',
+          description: 'The user ID for context.',
+          type: 'string',
+          required: true
+        },
+        {
+          arg: 'limit',
+          description: 'The number of posts to return',
+          type: 'string',
+          required: false
+        }
+      ],
+      returns: { root: true }
+    }
+  );
+
+  /**
+   * Gets the items to be reviewed by a user.
+   *
+   * @param userId
+   * @param limit
+   * @param callback
+   */
+  Post.getPostStream = function(userId, limit, callback) {
+    var getPosts = function(callback) {
+      Post.find({ limit: limit }, function(err, posts) {
+        callback(err, posts);
+      });
+    };
+
+    var injectUser = function(posts, callback) {
+      var User = app.models.Member;
+      var postsMods = [];
+
+      async.each(posts, function(post, callback) {
+        // Get the user data.
+        User.findOne({ where: { id: post.user_id } }, function(err, user) {
+          post.user = user;
+          postsMods.push(post);
+          callback(err);
+        });
+      }, function(err) {
+        callback(err, postsMods);
+      });
+    };
+
+    async.waterfall([
+      async.apply(getPosts),
+      async.apply(injectUser)
+    ], function(err, posts) {
       callback(err, posts);
     });
   };

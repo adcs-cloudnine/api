@@ -271,7 +271,10 @@ function DummyData() {
         large: image
       };
       postCreate.rating = 'healthy';
-      postCreate.created_at = 12345678;
+
+      var randomDate = Math.random() * (1447113600 - 1443657600) + 1443657600 | 0;
+      postCreate.created_at = randomDate;
+      postCreate.updated_at = randomDate;
       posts.push(postCreate);
     }
 

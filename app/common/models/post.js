@@ -10,8 +10,8 @@ module.exports = function(Post) {
     var now = Date.now() / 1000 | 0;
 
     if (context.instance.id == null) {
-      context.instance.created_at = now;
-      context.instance.updated_at = now;
+      context.instance.created_at = context.instance.created_at ? context.instance.created_at : now;
+      context.instance.updated_at = context.instance.updated_at ? context.instance.updated_at : now;
       context.instance.review_healthy_count = 0;
       context.instance.review_unhealthy_count = 0;
     } else {
@@ -80,7 +80,7 @@ module.exports = function(Post) {
   Post.getUserPosts = function(userId, options, callback) {
     log.info('Post.getUserPosts() - called');
 
-    Post.find({ where: { user_id: userId }, limit: options.limit }, function(err, posts) {
+    Post.find({ where: { user_id: userId }, limit: options.limit, order: 'created_at DESC' }, function(err, posts) {
       log.info('Post.getUserPosts() - post count:', posts.length);
       callback(err, posts);
     });

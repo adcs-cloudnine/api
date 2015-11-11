@@ -316,6 +316,7 @@ module.exports = function(Member) {
     postLimit = postLimit ? postLimit : 5;
     userLimit = userLimit ? userLimit : 50;
 
+    // Get the user.
     Member.findOne({ where: { id: userId } }, function(err, user) {
       var query = {
         where: {

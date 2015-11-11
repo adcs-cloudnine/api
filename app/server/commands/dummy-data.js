@@ -211,19 +211,22 @@ function DummyData() {
   };
 
   that.createPosts = function(callback) {
-    that.generatePosts(that.usersCreated['mp'].id, 75, 25);
-    that.generatePosts(that.usersCreated['cw'].id, 60, 40);
-    that.generatePosts(that.usersCreated['jc'].id, 90, 10);
-    that.generatePosts(that.usersCreated['gf'].id, 10, 90);
-    that.generatePosts(that.usersCreated['no'].id, 90, 10);
-    that.generatePosts(that.usersCreated['sm'].id, 70, 30);
-    that.generatePosts(that.usersCreated['gd'].id, 70, 30);
-    that.generatePosts(that.usersCreated['st'].id, 80, 20);
-    that.generatePosts(that.usersCreated['ab'].id, 85, 15);
-    callback();
+    async.parallel([
+      async.apply(that.generatePosts, that.usersCreated['mp'].id, 75, 25),
+      async.apply(that.generatePosts, that.usersCreated['cw'].id, 60, 40),
+      async.apply(that.generatePosts, that.usersCreated['jc'].id, 90, 10),
+      async.apply(that.generatePosts, that.usersCreated['gf'].id, 10, 90),
+      async.apply(that.generatePosts, that.usersCreated['no'].id, 90, 10),
+      async.apply(that.generatePosts, that.usersCreated['sm'].id, 70, 30),
+      async.apply(that.generatePosts, that.usersCreated['gd'].id, 70, 30),
+      async.apply(that.generatePosts, that.usersCreated['st'].id, 80, 20),
+      async.apply(that.generatePosts, that.usersCreated['ab'].id, 85, 15)
+    ], function(err, results) {
+      callback(err);
+    });
   };
 
-  that.generatePosts = function(userId, healthyCount, unhealthyCount) {
+  that.generatePosts = function(userId, healthyCount, unhealthyCount, callback) {
     log.info('generatePosts() - called for:', userId);
     var images = {
       healthy: [
@@ -289,12 +292,12 @@ function DummyData() {
 
     posts = _.shuffle(posts);
 
-    async.eachSeries(posts, function(post, callback) {
+    async.each(posts, function(post, callback) {
       Post.create(post, function(err, result) {
         callback(err, result);
       });
     }, function(err, results) {
-      console.log(err);
+      callback(err);
     });
   };
 

@@ -277,7 +277,9 @@ function DummyData() {
       postCreate.user_id = userId;
 
       var image = images['healthy'][Math.floor(Math.random()*images['healthy'].length)];
-      var randomDate = Math.random() * (1447113600 - 1443657600) + 1443657600 | 0;
+      //var randomDate = Math.random() * (1447113600 - 1443657600) + 1443657600 | 0;
+      var randomDate = new Date();
+      randomDate = randomDate.getTime() / 1000 | 0;
 
       postCreate.images = {
         small: image,
@@ -296,7 +298,9 @@ function DummyData() {
       postCreate.user_id = userId;
 
       var image = images['unhealthy'][Math.floor(Math.random()*images['unhealthy'].length)];
-      var randomDate = Math.random() * (1447113600 - 1443657600) + 1443657600 | 0;
+      //var randomDate = Math.random() * (1447113600 - 1443657600) + 1443657600 | 0;
+      var randomDate = new Date();
+      randomDate = randomDate.getTime() / 1000 | 0;
 
       postCreate.images = {
         small: image,

@@ -337,7 +337,7 @@ module.exports = function(Member) {
         async.each(users, function(user, callback) {
           user.posts = [];
 
-          Post.getUserPosts(user.id, { limit: postLimit }, function(err, posts) {
+          Post.getUserPosts(user.id + '', { limit: postLimit }, function(err, posts) {
             if (posts) {
               user.posts = posts;
             }

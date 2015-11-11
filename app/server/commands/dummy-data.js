@@ -238,7 +238,7 @@ function DummyData() {
 
   that.generatePosts = function(userId, healthyCount, unhealthyCount, callback) {
     userId = userId + '';
-    
+
     log.info('generatePosts() - called for:', userId);
     var images = {
       healthy: [

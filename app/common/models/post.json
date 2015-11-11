@@ -6,7 +6,6 @@
   "http": {
     "path": "posts"
   },
-  "properties": {},
   "validations": [],
   "relations": {},
   "acls": [],

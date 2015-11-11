@@ -387,13 +387,13 @@ module.exports = function(Member) {
     log.info('Member.getUserPosts() - called');
     limit = limit ? limit : 25;
 
-    Member.findOne({ where: { id: userId } }, function(err, user) {
+    Member.findOne({ where: { id: userId + '' } }, function(err, user) {
       var Post = app.models.Post;
       var Review = app.models.Review;
       var Member = app.models.Member;
 
       var getPosts = function(callback) {
-        Post.getUserPosts(user.id, { limit: limit }, function(err, posts) {
+        Post.getUserPosts(user.id + '', { limit: limit }, function(err, posts) {
           callback(err, posts);
         });
       };

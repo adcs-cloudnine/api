@@ -117,8 +117,10 @@ module.exports = function(Post) {
    * @param callback
    */
   Post.getPostStream = function(userId, limit, callback) {
+    log.info('Post.getPostStream - called');
+
     var getPosts = function(callback) {
-      Post.find({ limit: limit, order: 'created_at DESC' }, function(err, posts) {
+      Post.find({ order: 'created_at DESC', limit: limit }, function(err, posts) {
         callback(err, posts);
       });
     };
@@ -127,7 +129,7 @@ module.exports = function(Post) {
       var User = app.models.Member;
       var postsMods = [];
 
-      async.each(posts, function(post, callback) {
+      async.eachSeries(posts, function(post, callback) {
         // Get the user data.
         User.findOne({ where: { id: post.user_id } }, function(err, user) {
           post.user = user;

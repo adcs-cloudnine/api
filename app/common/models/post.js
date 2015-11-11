@@ -15,7 +15,6 @@ module.exports = function(Post) {
       context.instance.review_healthy_count = 0;
       context.instance.review_unhealthy_count = 0;
     } else {
-      console.log(context.instance);
       context.instance.updated_at = now;
     }
 
@@ -119,7 +118,7 @@ module.exports = function(Post) {
    */
   Post.getPostStream = function(userId, limit, callback) {
     var getPosts = function(callback) {
-      Post.find({ limit: limit }, function(err, posts) {
+      Post.find({ limit: limit, order: 'created_at DESC' }, function(err, posts) {
         callback(err, posts);
       });
     };

@@ -436,4 +436,48 @@ module.exports = function(Member) {
       });
     });
   };
+
+  Member.remoteMethod(
+    'searchUsers',
+    {
+      description: 'Search for a user by name.',
+      http: { path: '/search', verb: 'get' },
+      accepts: [
+        {
+          arg: 'q',
+          description: 'The search query.',
+          type: 'string',
+          required: true
+        }
+      ],
+
+      returns: { root: true }
+    }
+  );
+
+  /**
+   * Search for a user.
+   *
+   * @param q
+   * @param callback
+   */
+  Member.searchUsers = function(q, callback) {
+    log.info('Member.searchUsers() - called');
+
+    Member.getDataSource().connector.connect(function(err, db) {
+      db.collection('Member', function(err, collection) {
+        collection.find({ '$text': { '$search': q } }).toArray(function(err, results) {
+          var users = [];
+
+          results.forEach(function(user) {
+            user.id = user._id;
+            delete user._id;
+            users.push(user);
+          });
+
+          callback(err, users);
+        });
+      });
+    });
+  };
 };

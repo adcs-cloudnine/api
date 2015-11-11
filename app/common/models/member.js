@@ -153,7 +153,7 @@ module.exports = function(Member) {
     'addFollow',
     {
       description: 'Follow a user.',
-      http: { path: '/users/follow/add', verb: 'get' },
+      http: { path: '/follow/add', verb: 'get' },
       accepts: [
         {
           arg: 'userId',
@@ -216,7 +216,7 @@ module.exports = function(Member) {
     'removeFollow',
     {
       description: 'Remove a user that is followed.',
-      http: { path: '/users/follow/remove', verb: 'get' },
+      http: { path: '/follow/remove', verb: 'get' },
       accepts: [
         {
           arg: 'userId',

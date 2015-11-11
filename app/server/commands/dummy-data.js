@@ -162,8 +162,6 @@ function DummyData() {
         picture: user.picture,
       };
 
-      console.log(data);
-
       User.create(data, function(err, user) {
         log.info('Created user:', user.name);
         that.usersCreated[user.email] = user;
@@ -270,6 +268,7 @@ function DummyData() {
         large: image
       };
       postCreate.rating = 'healthy';
+      postCreate.created_at = 12345678;
       posts.push(postCreate);
     }
 
@@ -290,7 +289,7 @@ function DummyData() {
 
     posts = _.shuffle(posts);
 
-    async.each(posts, function(post, callback) {
+    async.eachSeries(posts, function(post, callback) {
       Post.create(post, function(err, result) {
         callback(err, result);
       });
